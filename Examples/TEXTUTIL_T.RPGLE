@@ -1,5 +1,5 @@
 **free
-ctl-opt bndDir( 'TEXTUTILS' : 'IUNIT/IUNIT' : 'OSSILE/OSSILE' );
+ctl-opt bndDir( 'TEXTUTILS' : 'IBMIUNIT/IBMIUNIT' : 'OSSILE/OSSILE' );
 
 // Test TEXTUTILS
 //
@@ -7,7 +7,7 @@ ctl-opt bndDir( 'TEXTUTILS' : 'IUNIT/IUNIT' : 'OSSILE/OSSILE' );
 //
 // 2/25/19..Stevers
 //   1. New program, copied from UTILS_TEST.
-//   2. Use iUnit framework.
+//   2. Use IBMiUnit framework.
 //   3. Add tests for removeAccents and removeUnprintable
 // 6/13/19..Stevers
 //   1. Removed failTest.
@@ -15,133 +15,139 @@ ctl-opt bndDir( 'TEXTUTILS' : 'IUNIT/IUNIT' : 'OSSILE/OSSILE' );
 //-------------------------------------------------------------------------------------------------
 
  /copy TextUtil_H
- /copy IUNIT/QRPGLESRC,iUnit_H
+ /copy IBMiUnit/QRPGLESRC,IBMiUnit_H
  /copy ArrayLst_H
 
  dcl-s arrayList pointer;
 
- iunit_setupSuite( 'TextUtil Tests'
+ IBMiUnit_setupSuite( 'TextUtil Tests'
                  : %pAddr( beforeTest ) : %pAddr( afterTest ) );
 
- iunit_addTestCase( %pAddr( toUpperCase_fromLower          ) : 'toUpperCase_fromLower' );
- iunit_addTestCase( %pAddr( toUpperCase_fromMixed          ) : 'toUpperCase_fromMixed' );
- iunit_addTestCase( %pAddr( toUpperCase_withBlanks         ) : 'toUpperCase_withBlanks' );
- iunit_addTestCase( %pAddr( toLowerCase_fromUpper          ) : 'toLowerCase_fromUpper' );
- iunit_addTestCase( %pAddr( toLowerCase_fromMixed          ) : 'toLowerCase_fromMixed' );
- iunit_addTestCase( %pAddr( toLowerCase_withBlanks         ) : 'toLowerCase_withBlanks' );
+ IBMiUnit_addTestCase( %pAddr( toUpperCase_fromLower          ) : 'toUpperCase_fromLower' );
+ IBMiUnit_addTestCase( %pAddr( toUpperCase_fromMixed          ) : 'toUpperCase_fromMixed' );
+ IBMiUnit_addTestCase( %pAddr( toUpperCase_withBlanks         ) : 'toUpperCase_withBlanks' );
+ IBMiUnit_addTestCase( %pAddr( toLowerCase_fromUpper          ) : 'toLowerCase_fromUpper' );
+ IBMiUnit_addTestCase( %pAddr( toLowerCase_fromMixed          ) : 'toLowerCase_fromMixed' );
+ IBMiUnit_addTestCase( %pAddr( toLowerCase_withBlanks         ) : 'toLowerCase_withBlanks' );
 
- iunit_addTestCase( %pAddr( trimAndUpperCase_fromLower     ) : 'trimAndUpperCase_fromLower' );
- iunit_addTestCase( %pAddr( trimAndUpperCase_leadingSpaces ) : 'trimAndUpperCase_leadingSpaces' );
- iunit_addTestCase( %pAddr( trimAndUpperCase_bothSpaces    ) : 'trimAndUpperCase_bothSpaces' );
- iunit_addTestCase( %pAddr( trimAndLowerCase_fromMixed     ) : 'trimAndLowerCase_fromMixed' );
- iunit_addTestCase( %pAddr( trimAndLowerCase_leadingSpaces ) : 'trimAndLowerCase_leadingSpaces' );
- iunit_addTestCase( %pAddr( trimAndLowerCase_bothSpaces    ) : 'trimAndLowerCase_bothSpaces' );
+ IBMiUnit_addTestCase( %pAddr( trimAndUpperCase_fromLower     ) : 'trimAndUpperCase_fromLower' );
+ IBMiUnit_addTestCase( %pAddr( trimAndUpperCase_leadingSpaces )
+                             : 'trimAndUpperCase_leadingSpaces' );
+ IBMiUnit_addTestCase( %pAddr( trimAndUpperCase_bothSpaces    ) : 'trimAndUpperCase_bothSpaces' );
+ IBMiUnit_addTestCase( %pAddr( trimAndLowerCase_fromMixed     ) : 'trimAndLowerCase_fromMixed' );
+ IBMiUnit_addTestCase( %pAddr( trimAndLowerCase_leadingSpaces )
+                             : 'trimAndLowerCase_leadingSpaces' );
+ IBMiUnit_addTestCase( %pAddr( trimAndLowerCase_bothSpaces    ) : 'trimAndLowerCase_bothSpaces' );
 
- iunit_addTestCase( %pAddr( toStringJsonArray_null         ) : 'toStringJsonArray_null' );
- iunit_addTestCase( %pAddr( toStringJsonArray_zeroElements ) : 'toStringJsonArray_zeroElements' );
- iunit_addTestCase( %pAddr( toStringJsonArray_oneElement   ) : 'toStringJsonArray_oneElement' );
- iunit_addTestCase( %pAddr( toStringJsonArray_twoElements  ) : 'toStringJsonArray_twoElements' );
- iunit_addTestCase( %pAddr( toStringJsonArray_doubleQuotes ) : 'toStringJsonArray_doubleQuotes' );
- iunit_addTestCase( %pAddr( toStringJsonArray_singleQuotes ) : 'toStringJsonArray_singleQuotes' );
- iunit_addTestCase( %pAddr( toStringJsonArray_paddedValues ) : 'toStringJsonArray_paddedValues' );
+ IBMiUnit_addTestCase( %pAddr( toStringJsonArray_null         ) : 'toStringJsonArray_null' );
+ IBMiUnit_addTestCase( %pAddr( toStringJsonArray_zeroElements )
+                             : 'toStringJsonArray_zeroElements' );
+ IBMiUnit_addTestCase( %pAddr( toStringJsonArray_oneElement   ) : 'toStringJsonArray_oneElement' );
+ IBMiUnit_addTestCase( %pAddr( toStringJsonArray_twoElements  ) : 'toStringJsonArray_twoElements' );
+ IBMiUnit_addTestCase( %pAddr( toStringJsonArray_doubleQuotes )
+                              : 'toStringJsonArray_doubleQuotes' );
+ IBMiUnit_addTestCase( %pAddr( toStringJsonArray_singleQuotes )
+                              : 'toStringJsonArray_singleQuotes' );
+ IBMiUnit_addTestCase( %pAddr( toStringJsonArray_paddedValues )
+                              : 'toStringJsonArray_paddedValues' );
 
- iunit_addTestCase( %pAddr( scanReverse_from25             ) : 'scanReverse_from25' );
- iunit_addTestCase( %pAddr( scanReverse_from30             ) : 'scanReverse_from30' );
+ IBMiUnit_addTestCase( %pAddr( scanReverse_from25             ) : 'scanReverse_from25' );
+ IBMiUnit_addTestCase( %pAddr( scanReverse_from30             ) : 'scanReverse_from30' );
  // TODO: Shelly: copy remaining _textutil_ tests from UTILS_TEST
- iunit_addTestCase( %pAddr( scanReverse_from25to0          ) : 'scanReverse_from25to0' );
- iunit_addTestCase( %pAddr( scanReverse_fromEndToStart     ) : 'scanReverse_fromEndToStart' );
- iunit_addTestCase( %pAddr( scanReverse_fromEndTo56        ) : 'scanReverse_fromEndTo56' );
- iunit_addTestCase( %pAddr( scanReverse_fromEndToComma     ) : 'scanReverse_fromEndToComma' );
+ IBMiUnit_addTestCase( %pAddr( scanReverse_from25to0          ) : 'scanReverse_from25to0' );
+ IBMiUnit_addTestCase( %pAddr( scanReverse_fromEndToStart     ) : 'scanReverse_fromEndToStart' );
+ IBMiUnit_addTestCase( %pAddr( scanReverse_fromEndTo56        ) : 'scanReverse_fromEndTo56' );
+ IBMiUnit_addTestCase( %pAddr( scanReverse_fromEndToComma     ) : 'scanReverse_fromEndToComma' );
 
-// iunit_addTestCase( %pAddr( toYN_singleCap                 ) : 'toYN_singleCap' );
-// iunit_addTestCase( %pAddr( toYN_wordMixed                 ) : 'toYN_wordMixed' );
-// iunit_addTestCase( %pAddr( toYN_wordLower                 ) : 'toYN_wordLower' );
-// iunit_addTestCase( %pAddr( toYN_singleSpcCap              ) : 'toYN_singleSpcCap' );
-// iunit_addTestCase( %pAddr( toYN_numSpaces                 ) : 'toYN_numSpaces' );
-// iunit_addTestCase( %pAddr( toYN_word2Mixed                ) : 'toYN_word2Mixed' );
-// iunit_addTestCase( %pAddr( toYN_wordSglQte                ) : 'toYN_wordSglQte' );
-// iunit_addTestCase( %pAddr( toYN_wordDblQte                ) : 'toYN_wordDblQte' );
-// iunit_addTestCase( %pAddr( toYN_singleCap2                ) : 'toYN_singleCap2' );
-// iunit_addTestCase( %pAddr( toYN_wordMixed2                ) : 'toYN_wordMixed2' );
-// iunit_addTestCase( %pAddr( toYN_singleSpcCap2             ) : 'toYN_singleSpcCap2' );
-// iunit_addTestCase( %pAddr( toYN_numSpaces2                ) : 'toYN_numSpaces' );
-// iunit_addTestCase( %pAddr( toYN_numSpaces2                ) : 'toYN_numSpaces' );
-// iunit_addTestCase( %pAddr( toYN_word3Mixed                ) : 'toYN_word3Mixed' );
-// iunit_addTestCase( %pAddr( toYN_word3Mixed                ) : 'toYN_word3Mixed' );
-// iunit_addTestCase( %pAddr( toYN_wordSglQte2               ) : 'toYN_wordSglQte2' );
-// iunit_addTestCase( %pAddr( toYN_wordDblQte2               ) : 'toYN_wordDblQte2' );
-// iunit_addTestCase( %pAddr( toYN_wordLower2                ) : 'toYN_wordLower2' );
-// iunit_addTestCase( %pAddr( toYN_blank                     ) : 'toYN_blank' );
-// iunit_addTestCase( %pAddr( toYN_blankSpaces               ) : 'toYN_blankSpaces' );
-// iunit_addTestCase( %pAddr( toYN_wordSglQte3               ) : 'toYN_wordSglQte3' );
-// iunit_addTestCase( %pAddr( toYN_singleLower               ) : 'toYN_singleLower' );
+// IBMiUnit_addTestCase( %pAddr( toYN_singleCap                 ) : 'toYN_singleCap' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordMixed                 ) : 'toYN_wordMixed' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordLower                 ) : 'toYN_wordLower' );
+// IBMiUnit_addTestCase( %pAddr( toYN_singleSpcCap              ) : 'toYN_singleSpcCap' );
+// IBMiUnit_addTestCase( %pAddr( toYN_numSpaces                 ) : 'toYN_numSpaces' );
+// IBMiUnit_addTestCase( %pAddr( toYN_word2Mixed                ) : 'toYN_word2Mixed' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordSglQte                ) : 'toYN_wordSglQte' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordDblQte                ) : 'toYN_wordDblQte' );
+// IBMiUnit_addTestCase( %pAddr( toYN_singleCap2                ) : 'toYN_singleCap2' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordMixed2                ) : 'toYN_wordMixed2' );
+// IBMiUnit_addTestCase( %pAddr( toYN_singleSpcCap2             ) : 'toYN_singleSpcCap2' );
+// IBMiUnit_addTestCase( %pAddr( toYN_numSpaces2                ) : 'toYN_numSpaces' );
+// IBMiUnit_addTestCase( %pAddr( toYN_numSpaces2                ) : 'toYN_numSpaces' );
+// IBMiUnit_addTestCase( %pAddr( toYN_word3Mixed                ) : 'toYN_word3Mixed' );
+// IBMiUnit_addTestCase( %pAddr( toYN_word3Mixed                ) : 'toYN_word3Mixed' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordSglQte2               ) : 'toYN_wordSglQte2' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordDblQte2               ) : 'toYN_wordDblQte2' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordLower2                ) : 'toYN_wordLower2' );
+// IBMiUnit_addTestCase( %pAddr( toYN_blank                     ) : 'toYN_blank' );
+// IBMiUnit_addTestCase( %pAddr( toYN_blankSpaces               ) : 'toYN_blankSpaces' );
+// IBMiUnit_addTestCase( %pAddr( toYN_wordSglQte3               ) : 'toYN_wordSglQte3' );
+// IBMiUnit_addTestCase( %pAddr( toYN_singleLower               ) : 'toYN_singleLower' );
 // Shelly - end
 
- iunit_addTestCase( %pAddr( removeAccents_nothing          ) : 'removeAccents_nothing' );
- iunit_addTestCase( %pAddr( removeAccents_a                ) : 'removeAccents_a' );
- iunit_addTestCase( %pAddr( removeAccents_b                ) : 'removeAccents_b' );
- iunit_addTestCase( %pAddr( removeAccents_c                ) : 'removeAccents_c' );
- iunit_addTestCase( %pAddr( removeAccents_e                ) : 'removeAccents_e' );
- iunit_addTestCase( %pAddr( removeAccents_i                ) : 'removeAccents_i' );
- iunit_addTestCase( %pAddr( removeAccents_n                ) : 'removeAccents_n' );
- iunit_addTestCase( %pAddr( removeAccents_o                ) : 'removeAccents_o' );
- iunit_addTestCase( %pAddr( removeAccents_u                ) : 'removeAccents_u' );
- iunit_addTestCase( %pAddr( removeAccents_y                ) : 'removeAccents_y' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_nothing          ) : 'removeAccents_nothing' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_a                ) : 'removeAccents_a' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_b                ) : 'removeAccents_b' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_c                ) : 'removeAccents_c' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_e                ) : 'removeAccents_e' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_i                ) : 'removeAccents_i' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_n                ) : 'removeAccents_n' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_o                ) : 'removeAccents_o' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_u                ) : 'removeAccents_u' );
+ IBMiUnit_addTestCase( %pAddr( removeAccents_y                ) : 'removeAccents_y' );
 
- iunit_addTestCase( %pAddr( removeUnprintable_nothing      ) : 'removeUnprintable_nothing' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex0         ) : 'removeUnprintable_hex0' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex1         ) : 'removeUnprintable_hex1' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex2         ) : 'removeUnprintable_hex2' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex3         ) : 'removeUnprintable_hex3' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex4         ) : 'removeUnprintable_hex4' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex5         ) : 'removeUnprintable_hex5' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex6         ) : 'removeUnprintable_hex6' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex7         ) : 'removeUnprintable_hex7' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex8         ) : 'removeUnprintable_hex8' );
- iunit_addTestCase( %pAddr( removeUnprintable_hex9         ) : 'removeUnprintable_hex9' );
- iunit_addTestCase( %pAddr( removeUnprintable_hexA         ) : 'removeUnprintable_hexA' );
- iunit_addTestCase( %pAddr( removeUnprintable_hexB         ) : 'removeUnprintable_hexB' );
- iunit_addTestCase( %pAddr( removeUnprintable_hexC         ) : 'removeUnprintable_hexC' );
- iunit_addTestCase( %pAddr( removeUnprintable_hexD         ) : 'removeUnprintable_hexD' );
- iunit_addTestCase( %pAddr( removeUnprintable_hexE         ) : 'removeUnprintable_hexE' );
- iunit_addTestCase( %pAddr( removeUnprintable_hexF         ) : 'removeUnprintable_hexF' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_nothing      ) : 'removeUnprintable_nothing' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex0         ) : 'removeUnprintable_hex0' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex1         ) : 'removeUnprintable_hex1' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex2         ) : 'removeUnprintable_hex2' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex3         ) : 'removeUnprintable_hex3' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex4         ) : 'removeUnprintable_hex4' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex5         ) : 'removeUnprintable_hex5' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex6         ) : 'removeUnprintable_hex6' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex7         ) : 'removeUnprintable_hex7' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex8         ) : 'removeUnprintable_hex8' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hex9         ) : 'removeUnprintable_hex9' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hexA         ) : 'removeUnprintable_hexA' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hexB         ) : 'removeUnprintable_hexB' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hexC         ) : 'removeUnprintable_hexC' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hexD         ) : 'removeUnprintable_hexD' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hexE         ) : 'removeUnprintable_hexE' );
+ IBMiUnit_addTestCase( %pAddr( removeUnprintable_hexF         ) : 'removeUnprintable_hexF' );
 
- iunit_addTestCase( %pAddr( parseDate_slashMdcy            ) : 'parseDate_slashMdcy' );
- iunit_addTestCase( %pAddr( parseDate_slashMdy             ) : 'parseDate_slashMdy' );
- iunit_addTestCase( %pAddr( parseDate_slashMd99            ) : 'parseDate_slashMd99' );
- iunit_addTestCase( %pAddr( parseDate_dashMdcy             ) : 'parseDate_dashMdcy' );
- iunit_addTestCase( %pAddr( parseDate_dashMdy              ) : 'parseDate_dashMdy' );
- iunit_addTestCase( %pAddr( parseDate_dashMd99             ) : 'parseDate_dashMd99' );
- iunit_addTestCase( %pAddr( parseDate_dotDmcy              ) : 'parseDate_dotDmcy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slashMdcy            ) : 'parseDate_slashMdcy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slashMdy             ) : 'parseDate_slashMdy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slashMd99            ) : 'parseDate_slashMd99' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dashMdcy             ) : 'parseDate_dashMdcy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dashMdy              ) : 'parseDate_dashMdy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dashMd99             ) : 'parseDate_dashMd99' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dotDmcy              ) : 'parseDate_dotDmcy' );
 
- iunit_addTestCase( %pAddr( parseDate_slashMdcyTime        ) : 'parseDate_slashMdcyTime' );
- iunit_addTestCase( %pAddr( parseDate_slashMdyTime         ) : 'parseDate_slashMdyTime' );
- iunit_addTestCase( %pAddr( parseDate_slashMd99Time        ) : 'parseDate_slashMd99Time' );
- iunit_addTestCase( %pAddr( parseDate_dashMdcyTime         ) : 'parseDate_dashMdcyTime' );
- iunit_addTestCase( %pAddr( parseDate_dashMdyTime          ) : 'parseDate_dashMdyTime' );
- iunit_addTestCase( %pAddr( parseDate_dashMd99Time         ) : 'parseDate_dashMd99Time' );
- iunit_addTestCase( %pAddr( parseDate_dotDmcyTime          ) : 'parseDate_dotDmcyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slashMdcyTime        ) : 'parseDate_slashMdcyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slashMdyTime         ) : 'parseDate_slashMdyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slashMd99Time        ) : 'parseDate_slashMd99Time' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dashMdcyTime         ) : 'parseDate_dashMdcyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dashMdyTime          ) : 'parseDate_dashMdyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dashMd99Time         ) : 'parseDate_dashMd99Time' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dotDmcyTime          ) : 'parseDate_dotDmcyTime' );
 
- iunit_addTestCase( %pAddr( parseDate_slash0Mdcy           ) : 'parseDate_slash0Mdcy' );
- iunit_addTestCase( %pAddr( parseDate_slash0Mdy            ) : 'parseDate_slash0Mdy' );
- iunit_addTestCase( %pAddr( parseDate_slash0Md99           ) : 'parseDate_slash0Md99' );
- iunit_addTestCase( %pAddr( parseDate_dash0Mdcy            ) : 'parseDate_dash0Mdcy' );
- iunit_addTestCase( %pAddr( parseDate_dash0Mdy             ) : 'parseDate_dash0Mdy' );
- iunit_addTestCase( %pAddr( parseDate_dash0Md99            ) : 'parseDate_dash0Md99' );
- iunit_addTestCase( %pAddr( parseDate_dot0Dmcy             ) : 'parseDate_dot0Dmcy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slash0Mdcy           ) : 'parseDate_slash0Mdcy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slash0Mdy            ) : 'parseDate_slash0Mdy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slash0Md99           ) : 'parseDate_slash0Md99' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dash0Mdcy            ) : 'parseDate_dash0Mdcy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dash0Mdy             ) : 'parseDate_dash0Mdy' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dash0Md99            ) : 'parseDate_dash0Md99' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dot0Dmcy             ) : 'parseDate_dot0Dmcy' );
 
- iunit_addTestCase( %pAddr( parseDate_slash0MdcyTime       ) : 'parseDate_slash0MdcyTime' );
- iunit_addTestCase( %pAddr( parseDate_slash0MdyTime        ) : 'parseDate_slash0MdyTime' );
- iunit_addTestCase( %pAddr( parseDate_slash0Md99Time       ) : 'parseDate_slash0Md99Time' );
- iunit_addTestCase( %pAddr( parseDate_dash0MdcyTime        ) : 'parseDate_dash0MdcyTime' );
- iunit_addTestCase( %pAddr( parseDate_dash0MdyTime         ) : 'parseDate_dash0MdyTime' );
- iunit_addTestCase( %pAddr( parseDate_dash0Md99Time        ) : 'parseDate_dash0Md99Time' );
- iunit_addTestCase( %pAddr( parseDate_dot0DmcyTime         ) : 'parseDate_dot0DmcyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slash0MdcyTime       ) : 'parseDate_slash0MdcyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slash0MdyTime        ) : 'parseDate_slash0MdyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_slash0Md99Time       ) : 'parseDate_slash0Md99Time' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dash0MdcyTime        ) : 'parseDate_dash0MdcyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dash0MdyTime         ) : 'parseDate_dash0MdyTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dash0Md99Time        ) : 'parseDate_dash0Md99Time' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dot0DmcyTime         ) : 'parseDate_dot0DmcyTime' );
 
- iunit_addTestCase( %pAddr( parseDate_dashIso              ) : 'parseDate_dashIso' );
- iunit_addTestCase( %pAddr( parseDate_dashIsoTime          ) : 'parseDate_dashIsoTime' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dashIso              ) : 'parseDate_dashIso' );
+ IBMiUnit_addTestCase( %pAddr( parseDate_dashIsoTime          ) : 'parseDate_dashIsoTime' );
 
- iunit_teardownSuite();
+ IBMiUnit_teardownSuite();
  return;
 
  // support methods
