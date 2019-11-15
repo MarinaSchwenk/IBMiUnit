@@ -1,0 +1,52 @@
+#!/QOpenSys/usr/bin/sh
+#
+# Create the IBMiUnit message file
+#
+# usage: build [ options ]
+#   -l [lib]     specify the target library            (default = IBMIUNIT)
+#   -o [owner]   owner of the message file             (default = QPGMR)
+#
+
+typeset -u TGTLIB
+typeset -u OBJOWN
+
+# gather inputs
+
+while getopts "l:o:h" optchar ; do
+	case $optchar in 
+		l)	TGTLIB=$OPTARG ;;
+		o)	OBJOWN=$OPTARG ;;
+		h)	echo "usage: [-l library; default IBMIUNIT] [-o owner; default QPGMR] [-h]"
+			exit 1
+			;;
+		\?) echo "usage: [-l library; default IBMIUNIT] [-o owner; default QPGMR] [-h]"
+			exit 1
+			;;
+	esac 
+done
+
+if [ "$TGTLIB" == "" ]; then
+	TGTLIB=IBMIUNIT
+fi
+
+if [ "$OBJOWN" == "" ]; then
+	OBJOWN=QPGMR
+fi
+
+# prepare the message file
+
+if [ -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.MSGF" ]; then
+
+	# message file already exists, remove it
+
+	system -iq "DLTMSGF MSGF($TGTLIB/IBMIUNIT)"
+
+fi
+
+system -q "CRTMSGF MSGF($TGTLIB/IBMIUNIT) TEXT('IBMiUnit messages')"
+system -q "CHGOBJOWN OBJ($TGTLIB/IBMIUNIT) OBJTYPE(*MSGF) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+
+# add default messages to the file
+
+BUILD=$(date +'%Y.%m.%d')
+system -q "ADDMSGD MSGID(TST0000) MSGF($TGTLIB/IBMIUNIT) MSG('IBMiUnit v1.1 build $BUILD')"

@@ -1,0 +1,628 @@
+#
+# build the IBMiUnit objects from the IFS source
+#
+# usage: build [ options ]
+#   -l [lib]     specify the target library                                (default = IBMIUNIT)
+#   -o [owner]   objects will be owned by this profile                     (default = QPGMR)
+#   -s [source]  source library                                            (default = *NONE)
+#   -f           save the target library to a save file in the repository  (default = false)
+#   -t           compile programs that test IBMiUnit                       (default = false)
+#   -v           verbose compile output                                    (default = false)
+#
+
+function errorTrap {
+    es=$?
+    echo "The script failed with exit status $es. Review the output in the build-output folder."
+	system -iq "DSPJOB OUTPUT(*PRINT) OPTION(*ALL)" | iconv -f 37 -t 1208 > build-output/dspjob.txt
+	exit $?
+}
+trap errorTrap ERR
+
+typeset -u OBJOWN
+typeset -u SRCLIB
+typeset -u TGTLIB
+CMPTEST=false
+VERBOSE=false
+SAVF=false
+
+# gather inputs
+
+while getopts "fhtvl:o:s:" optchar ; do
+	case $optchar in 
+		l)	TGTLIB=$OPTARG ;;
+		o)	OBJOWN=$OPTARG ;;
+		s)	SRCLIB=$OPTARG ;;
+		f)  SAVF=true ;;
+		t)	CMPTEST=true ;;
+		v)	VERBOSE=true ;;
+		h)	echo "usage: [-l program library; default IBMIUNIT] [-o owner; default QPGMR] [-s source library; default *NONE] [-t; compile test programs] [-f] [-v] [-h]"
+			exit 1
+			;;
+		\?) echo "usage: [-l program library; default IBMIUNIT] [-o owner; default QPGMR] [-s source library; default *NONE] [-t; compile test programs] [-f] [-v] [-h]"
+			exit 1
+			;;
+	esac 
+done
+
+if [ "$TGTLIB" == "" ]; then
+	TGTLIB=IBMIUNIT
+fi
+
+if [ "$OBJOWN" == "" ]; then
+	OBJOWN=QPGMR
+fi
+
+if [ "$SRCLIB" == "*NONE" ]; then
+	SRCLIB=
+fi
+
+if [ "$VERBOSE" = "true" ]; then
+	SYSTEMOPT=-i
+else
+	SYSTEMOPT=-iq
+fi
+
+# prepare the build output directory
+
+if [ ! -e build-output ]; then
+
+	# need to create the folder
+	
+	mkdir build-output
+
+else
+
+	# folder exists; make sure it is empty
+	
+	rm -f build-output/*
+	
+fi
+
+cp ./build build-output
+
+# prepare the libraries
+
+echo ""
+echo "Installing IBMiUnit to library $TGTLIB owned by $OBJOWN..."
+if [ "$VERBOSE" = "true" ]; then
+	echo ""
+fi
+
+if [ -e "/QSYS.LIB/$TGTLIB.LIB" ]; then
+
+	# library exists, remove any previous IBMiUnit objects
+
+	if [ -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.MSGF" ]; then
+		system $SYSTEMOPT "DLTMSGF MSGF($TGTLIB/IBMIUNIT)"
+	fi
+
+	if [ -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.BNDDIR" ]; then
+		system $SYSTEMOPT "DLTBNDDIR BNDDIR($TGTLIB/IBMIUNIT)"
+	fi
+
+	if [ -e "/QSYS.LIB/$TGTLIB.LIB/RUNTEST.CMD" ]; then
+		system $SYSTEMOPT "DLTCMD CMD($TGTLIB/RUNTEST)"
+	fi
+
+	if [ -e "/QSYS.LIB/$TGTLIB.LIB/RUNTEST.PGM" ]; then
+		system $SYSTEMOPT "DLTPGM PGM($TGTLIB/RUNTEST)"
+	fi
+
+	if [ -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.MODULE" ]; then
+		system $SYSTEMOPT "DLTMOD MODULE($TGTLIB/IBMIUNIT)"
+	fi
+
+	if [ -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.SRVPGM" ]; then
+		system $SYSTEMOPT "DLTSRVPGM SRVPGM($TGTLIB/IBMIUNIT)"
+	fi
+
+	if [ -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUIDSP.PGM" ]; then
+		system $SYSTEMOPT "DLTPGM PGM($TGTLIB/IBMIUIDSP)"
+	fi
+
+	if [ -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUIINT.PGM" ]; then
+		system $SYSTEMOPT "DLTPGM PGM($TGTLIB/IBMIUIINT)"
+	fi
+
+	if [ "$CMPTEST" = "true" ]; then
+
+		# delete the test programs
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ACHAR.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_ACHAR)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ADATE.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_ADATE)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_AFLOA.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_AFLOA)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_AIND.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_AIND)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ANULL.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_ANULL)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ANUM.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_ANUM)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ASSER.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_ASSER)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ATIME.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_ATIME)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ATS.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_ATS)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ERROR.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_ERROR)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_FAIL.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_FAIL)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM0.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_NUM0)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM1.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_NUM1)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM2.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_NUM2)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM3.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_NUM3)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM4.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_NUM4)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM5.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_NUM5)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM6.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_NUM6)"
+		fi
+
+		if [ -e "/QSYS.LIB/$TGTLIB.LIB/TEST_SETUP.PGM" ]; then
+			system $SYSTEMOPT "DLTPGM PGM($TGTLIB/TEST_SETUP)"
+		fi
+
+	fi
+
+else
+
+	# library does not exists
+	
+	system $SYSTEMOPT "CRTLIB LIB($TGTLIB) TEXT('IBMiUnit test framework')"
+	system $SYSTEMOPT "CHGOBJOWN OBJ(QSYS/$TGTLIB) OBJTYPE(*LIB) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+
+fi
+
+# create any source files
+
+if [ "$SRCLIB" != "" ]; then
+
+	if [ "$VERBOSE" = "true" ]; then
+		echo ""
+	fi
+	echo "Copying source to $SRCLIB..."
+	if [ "$VERBOSE" = "true" ]; then
+		echo ""
+	fi
+
+	if [ ! -e "/QSYS.LIB/$SRCLIB.LIB" ]; then
+
+		# source library does not exists
+	
+		system $SYSTEMOPT "CRTLIB LIB($SRCLIB) TEXT('IBMiUnit source files')"
+		system $SYSTEMOPT "CHGOBJOWN OBJ(QSYS/$SRCLIB) OBJTYPE(*LIB) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+
+	fi
+
+	if [ ! -e "/QSYS.LIB/$SRCLIB.LIB/QCMDSRC.FILE" ]; then
+		system $SYSTEMOPT "CRTSRCPF FILE($SRCLIB/QCMDSRC) TEXT('IBMiUnit command source')"
+		system $SYSTEMOPT "CHGOBJOWN OBJ($SRCLIB/QCMDSRC) OBJTYPE(*FILE) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	fi
+
+	if [ ! -e "/QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE" ]; then
+		system $SYSTEMOPT "CRTSRCPF FILE($SRCLIB/QRPGLESRC) RCDLEN(112) TEXT('IBMiUnit ILE RPG IV source')"
+		system $SYSTEMOPT "CHGOBJOWN OBJ($SRCLIB/QRPGLESRC) OBJTYPE(*FILE) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	fi
+
+	if [ ! -e "/QSYS.LIB/$SRCLIB.LIB/QSRVSRC.FILE" ]; then
+		system $SYSTEMOPT "CRTSRCPF FILE($SRCLIB/QSRVSRC) TEXT('IBMiUnit binder source')"
+		system $SYSTEMOPT "CHGOBJOWN OBJ($SRCLIB/QSRVSRC) OBJTYPE(*FILE) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	fi
+
+	# copy source
+	
+	# the following string will cause sed to change "/copy IBMiUnit..." statements to "/copy IBMiUnit/QRPGLESRC,IBMiUnit..."
+	# (basically add the library and file) except for those /copy that already have a slash (because they use IFS or are
+	# already qualified)
+	
+	SEDMAINSRC="/\/copy .*\//!s/\/copy /\/copy $SRCLIB\/QRPGLESRC,/g"
+
+	system $SYSTEMOPT "CPYFRMSTMF FROMSTMF('src/main/QCMDSRC/RUNTEST.cmd') TOMBR('/QSYS.LIB/$SRCLIB.LIB/QCMDSRC.FILE/RUNTEST.MBR') MBROPT(*REPLACE) STMFCCSID(*PCASCII) DBFCCSID(37)"
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QCMDSRC) MBR(RUNTEST) SRCTYPE(CMD) TEXT('Run IBMiUnit Tests')"
+
+	system $SYSTEMOPT "CPYFRMSTMF FROMSTMF('src/main/QRPGLESRC/ARRAYLST_H.rpgle') TOMBR('/QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/ARRAYLST_H.MBR') MBROPT(*REPLACE) STMFCCSID(*PCASCII) DBFCCSID(37)"
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(ARRAYLST_H) SRCTYPE(RPGLE) TEXT('dynamic arrays')"
+
+	system $SYSTEMOPT "CPYFRMSTMF FROMSTMF('src/main/QRPGLESRC/RUNTEST.rpgle') TOMBR('/QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/RUNTEST.MBR') MBROPT(*REPLACE) STMFCCSID(*PCASCII) DBFCCSID(37)"
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(RUNTEST) SRCTYPE(RPGLE) TEXT('Run IBMiUnit Tests')"
+
+	system $SYSTEMOPT "CPYFRMSTMF FROMSTMF('src/main/QRPGLESRC/IBMIUI_H.rpgle') TOMBR('/QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/IBMIUI_H.MBR') MBROPT(*REPLACE) STMFCCSID(*PCASCII) DBFCCSID(37)"
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(IBMIUI_H) SRCTYPE(RPGLE) TEXT('Definitions for an IBMiUnit UI plug-in')"
+
+	system $SYSTEMOPT "CPYFRMSTMF FROMSTMF('src/main/QRPGLESRC/IBMIUNIT_H.rpgle') TOMBR('/QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/IBMIUNIT_H.MBR') MBROPT(*REPLACE) STMFCCSID(*PCASCII) DBFCCSID(37)"
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(IBMIUNIT_H) SRCTYPE(RPGLE) TEXT('Public definitions for IBMiUnit')"
+
+	sed -e "$SEDMAINSRC" < src/main/QRPGLESRC/IBMIUNIT.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/IBMIUNIT.MBR
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(IBMIUNIT) SRCTYPE(RPGLE) TEXT('IBMiUnit testing framework')"
+
+	sed -e "$SEDMAINSRC" < src/main/QRPGLESRC/IBMIUIDSP.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/IBMIUIDSP.MBR
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(IBMIUIDSP) SRCTYPE(RPGLE) TEXT('An IBMiUnit UI that just uses DSPLY')"
+
+	sed -e "$SEDMAINSRC" < src/main/QRPGLESRC/IBMIUIINT.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/IBMIUIINT.MBR
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(IBMIUIINT) SRCTYPE(RPGLE) TEXT('An IBMiUnit UI for interactive feedback')"
+
+	system $SYSTEMOPT "CPYFRMSTMF FROMSTMF('src/main/QSRVSRC/IBMIUNIT.bnd') TOMBR('/QSYS.LIB/$SRCLIB.LIB/QSRVSRC.FILE/IBMIUNIT.MBR') MBROPT(*REPLACE) STMFCCSID(*PCASCII) DBFCCSID(37)"
+	system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QSRVSRC) MBR(IBMIUNIT) SRCTYPE(BND) TEXT('Exports for IBMiUnit')"
+	
+	if [ "$CMPTEST" = "true" ]; then
+
+		# copy the test program source
+
+		SEDTESTSRC="s/\/copy \.\.\/\.\.\/main\/QRPGLESRC\/\(.*\)_h\.rpgle/\/copy $SRCLIB\/QRPGLESRC,\1_h/g"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST) SRCTYPE(RPGLE) TEXT('Test iUnit behavior')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_ACHAR.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_ACHAR.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_ACHAR) SRCTYPE(RPGLE) TEXT('assertCharEquals()/assertCharNotEquals() tests')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_ADATE.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_ADATE.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_ADATE) SRCTYPE(RPGLE) TEXT('assertDateEquals()/assertDateNotEquals() tests')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_AFLOA.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_AFLOA.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_AFLOA) SRCTYPE(RPGLE) TEXT('assertFloatEquals()/assertFloatNotEquals() tests')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_AIND.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_AIND.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_AIND) SRCTYPE(RPGLE) TEXT('assertOn()/assertOff() tests')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_ANULL.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_ANULL.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_ANULL) SRCTYPE(RPGLE) TEXT('assertNull()/assertNotNull() tests')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_ANUM.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_ANUM.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_ANUM) SRCTYPE(RPGLE) TEXT('assertNumericEquals()/assertNumericNotEquals()')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_ASSER.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_ASSER.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_ASSER) SRCTYPE(RPGLE) TEXT('assertXxx() tests')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_ATIME.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_ATIME.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_ATIME) SRCTYPE(RPGLE) TEXT('assertTimeEquals()/assertTimeNotEquals() tests')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_ATS.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_ATS.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_ATS) SRCTYPE(RPGLE) TEXT('assertTimestampEquals()/assertTimestampNotEquals()')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_ERROR.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_ERROR.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_ERROR) SRCTYPE(RPGLE) TEXT('Make sure IBMiUnit catches errors')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_FAIL.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_FAIL.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_FAIL) SRCTYPE(RPGLE) TEXT('fail() tests')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_NUM0.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_NUM0.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_NUM0) SRCTYPE(RPGLE) TEXT('Make sure the numberOfXxx calculations are correct')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_NUM1.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_NUM1.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_NUM1) SRCTYPE(RPGLE) TEXT('Make sure the numberOfXxx calculations are correct')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_NUM2.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_NUM2.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_NUM2) SRCTYPE(RPGLE) TEXT('Make sure the numberOfXxx calculations are correct')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_NUM3.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_NUM3.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_NUM3) SRCTYPE(RPGLE) TEXT('Make sure the numberOfXxx calculations are correct')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_NUM4.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_NUM4.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_NUM4) SRCTYPE(RPGLE) TEXT('Make sure the numberOfXxx calculations are correct')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_NUM5.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_NUM5.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_NUM5) SRCTYPE(RPGLE) TEXT('Make sure the numberOfXxx calculations are correct')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_NUM6.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_NUM6.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_NUM6) SRCTYPE(RPGLE) TEXT('Make sure the numberOfXxx calculations are correct')"
+
+		sed -e "$SEDTESTSRC" < src/test/QRPGLESRC/TEST_SETUP.rpgle > /QSYS.LIB/$SRCLIB.LIB/QRPGLESRC.FILE/TEST_SETUP.MBR
+		system $SYSTEMOPT "CHGPFM FILE($SRCLIB/QRPGLESRC) MBR(TEST_SETUP) SRCTYPE(RPGLE) TEXT('setup/teardown tests')"
+
+	fi
+
+fi
+
+# create objects
+
+if [ "$VERBOSE" = "true" ]; then
+	echo ""
+fi
+echo "Creating objects..."
+if [ "$VERBOSE" = "true" ]; then
+	echo ""
+fi
+
+src/main/crtmsgf -l $TGTLIB -o $OBJOWN
+
+system $SYSTEMOPT "CRTBNDDIR BNDDIR($TGTLIB/IBMIUNIT) TEXT('IBMiUnit binding directory')"
+system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/IBMIUNIT) OBJTYPE(*BNDDIR) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+system $SYSTEMOPT "ADDBNDDIRE BNDDIR($TGTLIB/IBMIUNIT) OBJ(($TGTLIB/IBMIUNIT))"
+
+if [ "$SRCLIB" != "" ]; then
+	
+	# create objects from the source files
+
+	system $SYSTEMOPT "CRTRPGMOD MODULE($TGTLIB/IBMIUNIT) SRCFILE($SRCLIB/QRPGLESRC) TGTRLS(V7R1M0) DBGVIEW(*SOURCE)" | iconv -f 37 -t 1208 > build-output/crtrpgmod-ibmiunit.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.MODULE" ]; then echo "Unable to create *MODULE IBMIUNIT. Review compile listing in build-output."; exit 1; fi
+
+	system $SYSTEMOPT "CRTSRVPGM SRVPGM($TGTLIB/IBMIUNIT) SRCFILE($SRCLIB/QSRVSRC) TEXT('IBMiUnit testing framework') TGTRLS(V7R1M0) USRPRF(*USER)" 2>&1 >/dev/null | iconv -f 37 -t 1208 > build-output/crtsrvpgm-ibmiunit.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.SRVPGM" ]; then echo "Unable to create *SRVPGM IBMIUNIT. Review compile listing in build-output."; exit 1; fi
+
+	system $SYSTEMOPT "CRTCMD CMD($TGTLIB/RUNTEST) PGM($TGTLIB/RUNTEST) SRCFILE($SRCLIB/QCMDSRC)" | iconv -f 37 -t 1208 > build-output/crtcmd-runtest.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/RUNTEST.CMD" ]; then echo "Unable to create *CMD RUNTEST. Review compile listing in build-output."; exit 1; fi
+
+	system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/RUNTEST) SRCFILE($SRCLIB/QRPGLESRC) TGTRLS(V7R1M0) BNDDIR($TGTLIB/IBMIUNIT) DFTACTGRP(*NO) DBGVIEW(*SOURCE) USRPRF(*USER)" | iconv -f 37 -t 1208 > build-output/crtbndrpg-runtest.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/RUNTEST.PGM" ]; then echo "Unable to create *PGM RUNTEST. Review compile listing in build-output."; exit 1; fi
+
+	system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/IBMIUIDSP) SRCFILE($SRCLIB/QRPGLESRC) TGTRLS(V7R1M0) DBGVIEW(*SOURCE) USRPRF(*USER)" | iconv -f 37 -t 1208 > build-output/crtbndrpg-ibmiuidsp.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUIDSP.PGM" ]; then echo "Unable to create *PGM IBMIUIDSP. Review compile listing in build-output."; exit 1; fi
+	
+	system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/IBMIUIINT) SRCFILE($SRCLIB/QRPGLESRC) TGTRLS(V7R1M0) DBGVIEW(*SOURCE) USRPRF(*USER)" | iconv -f 37 -t 1208 > build-output/crtbndrpg-ibmiuiint.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUIINT.PGM" ]; then echo "Unable to create *PGM IBMIUIINT. Review compile listing in build-output."; exit 1; fi
+
+	if [ "$CMPTEST" = "true" ]; then
+
+		# compile the test programs
+	
+		COMPILEPARMS="BNDDIR($TGTLIB/IBMIUNIT) DFTACTGRP(*NO) TGTRLS(V7R1M0) DBGVIEW(*SOURCE) USRPRF(*USER)"
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST.PGM" ]; then echo "Unable to create *PGM TEST. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ACHAR) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_achar.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ACHAR.PGM" ]; then echo "Unable to create *PGM TEST_ACHAR. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ADATE) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_adate.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ADATE.PGM" ]; then echo "Unable to create *PGM TEST_ADATE. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_AFLOA) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_afloa.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_AFLOA.PGM" ]; then echo "Unable to create *PGM TEST_AFLOA. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_AIND) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_aind.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_AIND.PGM" ]; then echo "Unable to create *PGM TEST_AIND. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ANULL) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_anull.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ANULL.PGM" ]; then echo "Unable to create *PGM TEST_ANULL. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ANUM) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_anum.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ANUM.PGM" ]; then echo "Unable to create *PGM TEST_ANUM. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ASSER) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_asser.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ASSER.PGM" ]; then echo "Unable to create *PGM TEST_ASSER. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ATIME) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_atime.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ATIME.PGM" ]; then echo "Unable to create *PGM TEST_ATIME. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ATS) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_ats.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ATS.PGM" ]; then echo "Unable to create *PGM TEST_ATS. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ERROR) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_error.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ERROR.PGM" ]; then echo "Unable to create *PGM TEST_ERROR. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_FAIL) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_fail.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_FAIL.PGM" ]; then echo "Unable to create *PGM TEST_FAIL. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM0) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num0.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM0.PGM" ]; then echo "Unable to create *PGM TEST_NUM0. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM1) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num1.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM1.PGM" ]; then echo "Unable to create *PGM TEST_NUM1. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM2) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num2.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM2.PGM" ]; then echo "Unable to create *PGM TEST_NUM2. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM3) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num3.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM3.PGM" ]; then echo "Unable to create *PGM TEST_NUM3. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM4) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num4.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM4.PGM" ]; then echo "Unable to create *PGM TEST_NUM4. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM5) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num5.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM5.PGM" ]; then echo "Unable to create *PGM TEST_NUM5. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM6) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num6.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM6.PGM" ]; then echo "Unable to create *PGM TEST_NUM6. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_SETUP) SRCFILE($SRCLIB/QRPGLESRC) $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_setup.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_SETUP.PGM" ]; then echo "Unable to create *PGM TEST_SETUP. Review compile listing in build-output."; exit 1; fi
+
+	fi
+	
+else
+
+	# create objects directly from the IFS
+
+	system $SYSTEMOPT "CRTRPGMOD MODULE($TGTLIB/IBMIUNIT) SRCSTMF('src/main/QRPGLESRC/IBMIUNIT.rpgle') TEXT('IBMiUnit testing framework') TGTRLS(V7R1M0) DBGVIEW(*SOURCE)" | iconv -f 37 -t 1208 > build-output/crtrpgmod-ibmiunit.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.MODULE" ]; then echo "Unable to create *MODULE IBMIUNIT. Review compile listing in build-output."; exit 1; fi
+
+	system $SYSTEMOPT "CRTSRVPGM SRVPGM($TGTLIB/IBMIUNIT) SRCSTMF('src/main/QSRVSRC/IBMIUNIT.bnd') TEXT('IBMiUnit testing framework') TGTRLS(V7R1M0) USRPRF(*USER)" 2>&1 >/dev/null | iconv -f 37 -t 1208 > build-output/crtsrvpgm-ibmiunit.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUNIT.SRVPGM" ]; then echo "Unable to create *SRVPGM IBMIUNIT. Review compile listing in build-output."; exit 1; fi
+
+	system $SYSTEMOPT "CRTCMD CMD($TGTLIB/RUNTEST) PGM($TGTLIB/RUNTEST) SRCSTMF('src/main/QCMDSRC/RUNTEST.cmd') TEXT('Run IBMiUnit Tests')" | iconv -f 37 -t 1208 > build-output/crtcmd-runtest.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/RUNTEST.CMD" ]; then echo "Unable to create *CMD RUNTEST. Review compile listing in build-output."; exit 1; fi
+
+	system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/RUNTEST) SRCSTMF('src/main/QRPGLESRC/RUNTEST.rpgle') TEXT('Run IBMiUnit Tests') TGTRLS(V7R1M0) BNDDIR($TGTLIB/IBMIUNIT) DFTACTGRP(*NO) DBGVIEW(*SOURCE) USRPRF(*USER)" | iconv -f 37 -t 1208 > build-output/crtbndrpg-runtest.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/RUNTEST.PGM" ]; then echo "Unable to create *PGM RUNTEST. Review compile listing in build-output."; exit 1; fi
+
+	system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/IBMIUIDSP) SRCSTMF('src/main/QRPGLESRC/IBMIUIDSP.rpgle') TEXT('An IBMiUnit UI that just uses DSPLY') TGTRLS(V7R1M0) DBGVIEW(*SOURCE) USRPRF(*USER)" | iconv -f 37 -t 1208 > build-output/crtbndrpg-ibmiuidsp.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUIDSP.PGM" ]; then echo "Unable to create *PGM IBMIUIDSP. Review compile listing in build-output."; exit 1; fi
+	
+	system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/IBMIUIINT) SRCSTMF('src/main/QRPGLESRC/IBMIUIINT.rpgle') TEXT('An IBMiUnit UI for interactive feedback') TGTRLS(V7R1M0) DBGVIEW(*SOURCE) USRPRF(*USER)" | iconv -f 37 -t 1208 > build-output/crtbndrpg-ibmiuiint.txt
+	if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/IBMIUIINT.PGM" ]; then echo "Unable to create *PGM IBMIUIINT. Review compile listing in build-output."; exit 1; fi
+
+	if [ "$CMPTEST" = "true" ]; then
+
+		# compile the test programs
+
+		COMPILEPARMS="BNDDIR($TGTLIB/IBMIUNIT) DFTACTGRP(*NO) TGTRLS(V7R1M0) DBGVIEW(*SOURCE) USRPRF(*USER)"
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST) SRCSTMF('src/test/QRPGLESRC/TEST.rpgle') TEXT('Test iUnit behavior') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST.PGM" ]; then echo "Unable to create *PGM TEST. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ACHAR) SRCSTMF('src/test/QRPGLESRC/TEST_ACHAR.rpgle') TEXT('assertCharEquals()/assertCharNotEquals() tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_achar.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ACHAR.PGM" ]; then echo "Unable to create *PGM TEST_ACHAR. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ADATE) SRCSTMF('src/test/QRPGLESRC/TEST_ADATE.rpgle') TEXT('assertDateEquals()/assertDateNotEquals() tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_adate.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ADATE.PGM" ]; then echo "Unable to create *PGM TEST_ADATE. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_AFLOA) SRCSTMF('src/test/QRPGLESRC/TEST_AFLOA.rpgle') TEXT('assertFloatEquals()/assertFloatNotEquals() tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_afloa.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_AFLOA.PGM" ]; then echo "Unable to create *PGM TEST_AFLOA. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_AIND) SRCSTMF('src/test/QRPGLESRC/TEST_AIND.rpgle') TEXT('assertOn()/assertOff() tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_aind.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_AIND.PGM" ]; then echo "Unable to create *PGM TEST_AIND. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ANULL) SRCSTMF('src/test/QRPGLESRC/TEST_ANULL.rpgle') TEXT('assertNull()/assertNotNull() tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_anull.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ANULL.PGM" ]; then echo "Unable to create *PGM TEST_ANULL. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ANUM) SRCSTMF('src/test/QRPGLESRC/TEST_ANUM.rpgle') TEXT('assertNumericEquals()/assertNumericNotEquals()') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_anum.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ANUM.PGM" ]; then echo "Unable to create *PGM TEST_ANUM. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ASSER) SRCSTMF('src/test/QRPGLESRC/TEST_ASSER.rpgle') TEXT('assertXxx() tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_asser.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ASSER.PGM" ]; then echo "Unable to create *PGM TEST_ASSER. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ATIME) SRCSTMF('src/test/QRPGLESRC/TEST_ATIME.rpgle') TEXT('assertTimeEquals()/assertTimeNotEquals() tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_atime.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ATIME.PGM" ]; then echo "Unable to create *PGM TEST_ATIME. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ATS) SRCSTMF('src/test/QRPGLESRC/TEST_ATS.rpgle') TEXT('assertTimestampEquals()/assertTimestampNotEquals()') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_ats.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ATS.PGM" ]; then echo "Unable to create *PGM TEST_ATS. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_ERROR) SRCSTMF('src/test/QRPGLESRC/TEST_ERROR.rpgle') TEXT('Make sure IBMiUnit catches errors') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_error.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_ERROR.PGM" ]; then echo "Unable to create *PGM TEST_ERROR. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_FAIL) SRCSTMF('src/test/QRPGLESRC/TEST_FAIL.rpgle') TEXT('fail() tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_fail.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_FAIL.PGM" ]; then echo "Unable to create *PGM TEST_FAIL. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM0) SRCSTMF('src/test/QRPGLESRC/TEST_NUM0.rpgle') TEXT('Make sure the numberOfXxx calculations are correct') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num0.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM0.PGM" ]; then echo "Unable to create *PGM TEST_NUM0. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM1) SRCSTMF('src/test/QRPGLESRC/TEST_NUM1.rpgle') TEXT('Make sure the numberOfXxx calculations are correct') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num1.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM1.PGM" ]; then echo "Unable to create *PGM TEST_NUM1. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM2) SRCSTMF('src/test/QRPGLESRC/TEST_NUM2.rpgle') TEXT('Make sure the numberOfXxx calculations are correct') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num2.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM2.PGM" ]; then echo "Unable to create *PGM TEST_NUM2. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM3) SRCSTMF('src/test/QRPGLESRC/TEST_NUM3.rpgle') TEXT('Make sure the numberOfXxx calculations are correct') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num3.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM3.PGM" ]; then echo "Unable to create *PGM TEST_NUM3. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM4) SRCSTMF('src/test/QRPGLESRC/TEST_NUM4.rpgle') TEXT('Make sure the numberOfXxx calculations are correct') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num4.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM4.PGM" ]; then echo "Unable to create *PGM TEST_NUM4. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM5) SRCSTMF('src/test/QRPGLESRC/TEST_NUM5.rpgle') TEXT('Make sure the numberOfXxx calculations are correct') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num5.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM5.PGM" ]; then echo "Unable to create *PGM TEST_NUM5. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_NUM6) SRCSTMF('src/test/QRPGLESRC/TEST_NUM6.rpgle') TEXT('Make sure the numberOfXxx calculations are correct') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_num6.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_NUM6.PGM" ]; then echo "Unable to create *PGM TEST_NUM6. Review compile listing in build-output."; exit 1; fi
+
+		system $SYSTEMOPT "CRTBNDRPG PGM($TGTLIB/TEST_SETUP) SRCSTMF('src/test/QRPGLESRC/TEST_SETUP.rpgle') TEXT('setup/teardown tests') $COMPILEPARMS" | iconv -f 37 -t 1208 > build-output/crtbndrpg-test_setup.txt
+		if [ ! -e "/QSYS.LIB/$TGTLIB.LIB/TEST_SETUP.PGM" ]; then echo "Unable to create *PGM TEST_SETUP. Review compile listing in build-output."; exit 1; fi
+
+	fi
+
+fi
+
+system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/RUNTEST) OBJTYPE(*CMD) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+system $SYSTEMOPT "CHGCMD CMD($TGTLIB/RUNTEST) PRDLIB($TGTLIB)"
+
+system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/RUNTEST) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+
+system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/IBMIUNIT) OBJTYPE(*SRVPGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+system $SYSTEMOPT "DLTMOD MODULE($TGTLIB/IBMIUNIT)"
+
+system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/IBMIUIDSP) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/IBMIUIINT) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+
+if [ "$CMPTEST" = "true" ]; then
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_ACHAR) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_ADATE) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_AFLOA) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_AIND) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_ANULL) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_ANUM) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_ASSER) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_ATIME) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_ATS) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_ERROR) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_FAIL) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_NUM0) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_NUM1) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_NUM2) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_NUM3) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_NUM4) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_NUM5) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_NUM6) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+	system $SYSTEMOPT "CHGOBJOWN OBJ($TGTLIB/TEST_SETUP) OBJTYPE(*PGM) NEWOWN($OBJOWN) CUROWNAUT(*SAME)"
+fi
+
+# save the library back as a save file
+
+if [ "$SAVF" = "true" ]; then
+
+	if [ "$VERBOSE" = "true" ]; then
+		echo ""
+	fi
+	echo "Saving $TGTLIB as a SAVF..."
+	if [ "$VERBOSE" = "true" ]; then
+		echo ""
+	fi
+
+	if [ -e "/QSYS.LIB/QGPL.LIB/$TGTLIB.FILE" ]; then echo "File QGPL/$TGTLIB already exists, not able to copy *SAVF to repository"; exit 1; fi
+	if [ -e IBMIUNIT.SAVF ]; then rm IBMIUNIT.SAVF ; fi
+
+	system $SYSTEMOPT "CRTSAVF FILE(QGPL/$TGTLIB) TEXT('IBMiUnit save file')"
+	if [ ! -e "/QSYS.LIB/QGPL.LIB/$TGTLIB.FILE" ]; then echo "Unable to create QGPL/$TGTLIB *SAVF; build with -v for additional details"; exit 1; fi
+
+	system $SYSTEMOPT "SAVLIB LIB($TGTLIB) DEV(*SAVF) SAVF(QGPL/$TGTLIB) TGTRLS(V7R1M0) UPDHST(*NO) DTACPR(*HIGH)"
+
+	system $SYSTEMOPT "CPYTOSTMF FROMMBR('/QSYS.LIB/QGPL.LIB/$TGTLIB.FILE') TOSTMF('IBMIUNIT.SAVF') CVTDTA(*NONE) ENDLINFMT(*FIXED)"
+
+	system $SYSTEMOPT "DLTF FILE(QGPL/$TGTLIB)"
+	if [ -e "/QSYS.LIB/QGPL.LIB/$TGTLIB.FILE" ]; then echo "Unable to delete QGPL/$TGTLIB *SAVF"; exit 1; fi
+
+fi
+
+# wrap-up
+
+if [ "$VERBOSE" = "true" ]; then
+	echo ""
+fi
+echo "Done."
+echo ""

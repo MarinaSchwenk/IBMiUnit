@@ -64,7 +64,7 @@ message | varchar(256) | No | text to display on the UI; "assertion failure" wil
 
 ### assertOff
 
-Make sure the indicator is *OFF; fail with the optional message if it isn't.
+Make sure the indicator is \*OFF; fail with the optional message if it isn't.
 
 ####  Parameters
 
@@ -75,7 +75,7 @@ message | varchar(256) | No | text to display on the UI if the indicator is *ON
 
 ### assertOn
 
-Make sure the indicator is *ON; fail with the optional message if it isn't.
+Make sure the indicator is \*ON; fail with the optional message if it isn't.
 
 ####  Parameters
 
@@ -86,7 +86,7 @@ message | varchar(256) | No | text to display on the UI if the indicator is *OFF
 
 ### assertNull
 
-Make sure the pointer is *NULL; fail with the optional message if it isn't.
+Make sure the pointer is \*NULL; fail with the optional message if it isn't.
 
 ####  Parameters
 
@@ -97,7 +97,7 @@ message | varchar(256) | No | text to display on the UI if the pointer is not *N
 
 ### assertNotNull
 
-Make sure the pointer is not *NULL; fail with the optional message if it is.
+Make sure the pointer is not \*NULL; fail with the optional message if it is.
 
 ####  Parameters
 

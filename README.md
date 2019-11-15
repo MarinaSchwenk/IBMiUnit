@@ -1,33 +1,60 @@
 # IBMiUnit
-RPGLE unit testing framework 
+An RPGLE unit testing framework 
 
-## Installation
-
-### Dependencies 
+## Dependencies 
 
 [OSSILE](https://github.com/OSSILE/OSSILE)
 
-Download and restore the OSSILE library to your system. You can do that in their readme.md on the OSSILE project. 
+Download and restore the OSSILE library to your system. That `README.md` has instructions on how to do this.
 
-### Upload to your system
+## Installation
 
-1.	Create a save file on the IBM i, as follows: `CRTSAVF FILE(IBMiUnit/IBMiUnit)`
-2.	Go to a command window on your PC
-3.	Go to the location on the PC where the save file is stored
-4.	Enter one of the following: `ftp (ibmi_ip_address)` or `ftp (ibmi_name)`
-5.	Enter your IBM i username and password for that system when prompted.
-6.	To ensure the transfer mode is binary (there will be no conversion), enter the following command: `BIN`
-7.	To go to the library on the IBM i where the save file is stored, enter the following command: `CD IBMiUnit`
-8.	To transfer the save file from the PC to the empty save file on your IBM i, enter the following command: `PUT IBMiUnit IBMiUnit.savf`
-9.	When the transfer is complete, enter the following command to exit the FTP session: `QUIT`
-10.	To close the MS-DOS shell, enter the following command: `EXIT`
+### Clone Git Repository
 
-or
+This is the easiest way to obtain IBMiUnit; everyone has a Git client, right?
 
-- `CRTSAVF QGPL/IBMIUNIT`
-- `CPYFRMSTMF FROMSTMF('/home/IBMIUNIT.savf') TOMBR('/qsys.lib/qgpl.lib/IBMIUNIT.file') MBROPT(*REPLACE) CVTDTA(*NONE) ENDLINFMT(*FIXED) TABEXPN(*NO)`
-- `CRTLIB yyy`
-- `RSTLIB SAVLIB(IBMIUNIT) DEV(*SAVF) SAVF(QGPL/IBMIUNIT) MBROPT(*ALL) ALWOBJDIF(*ALL)`
+Well, this may not *currently* be the easiest way because the source still has a dependency on the [OSSILE](https://github.com/OSSILE/OSSILE) product. This will be removed in a future version of IBMiUnit but for now we assume and require the OSSILE library.
+
+1. Navigate to the directory where you want to place the new `IBMiUnit` folder on the i Series
+1. `git clone https://github.com/MarinaSchwenk/IBMiUnit.git`
+1. Open QShell in the `IBMiUnit` folder
+1. Run the `build` script; there are 6 optional parameters:
+  - `-l <obj-lib>` (that's a letter "L") install IBMiUnit to the specified library; default is `IBMIUNIT`
+  - `-s <src-lib>` copy source to the given library; default is to leave the source on the IFS and compile from there
+  - `-o <obj-owner>` the user profile that will own the new objects; default is `QPGMR`
+  - `-f` copy the obj-lib back into the repository as a save file; this is only useful to the repository contributors
+  - `-t` compile the test suite over IBMiUnit
+  - `-v` verbose output; this may be helpful or necessary when errors are encountered
+
+You can keep up-to-date with IBMiUnit by pulling from the repository and re-building.
+
+### From Save File (part 1)
+
+1. Create a save file on the IBM i, i.e. `CRTSAVF FILE(xxx/IBMIUNIT)`
+1. Download `IBMIUNIT.SAVF` from the IBMiUnit repository
+1. Choose one of the transfer options, then continue to part 2
+
+#### Transfer Using CPYFRMSTMF
+
+1. Copy the downloaded `IBMIUNIT.SAVF` to the IFS
+1. Copy from the IFS to the \*SAVF, i.e. `CPYFRMSTMF FROMSTMF('/path/to/file/IBMIUNIT.SAVF') TOMBR('/QSYS.LIB/xxx.LIB/IBMIUNIT.FILE') MBROPT(*REPLACE) CVTDTA(*NONE) ENDLINFMT(*FIXED) TABEXPN(*NO)`
+
+#### Transfer Using FTP
+
+1. Go to a command window on your PC
+1. Go to the location on the PC where `IBMIUNIT.SAVF` is located
+1. Enter one of the following: `ftp (ibmi_ip_address)` or `ftp (ibmi_name)`
+1. Enter your IBM i username and password for that system when prompted
+1. Ensure the transfer mode is binary (there will be no conversion) with `bin`
+1. Go to the library on the IBM i where the save file is stored using something like `cd /QSYS.LIB/xxx.LIB`
+1. Transfer the save file from the PC to the empty save file on your IBM i with `put IBMiUnit.savf IBMiUnit.savf`
+1. When the transfer is complete, exit FTP with `quit`
+1. Close the MS-DOS shell with `exit`
+
+### From Save File (part 2)
+
+1. Create the library for the objects, i.e. `CRTLIB yyy`
+1. Restore from the \*SAVF, i.e. `RSTLIB SAVLIB(IBMIUNIT) DEV(*SAVF) SAVF(xxx/IBMIUNIT) RSTLIB(yyy) MBROPT(*ALL) ALWOBJDIF(*ALL)`
 
 ## Examples
 
