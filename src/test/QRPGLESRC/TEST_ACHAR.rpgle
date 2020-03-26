@@ -1,13 +1,11 @@
 **free
 
-ctl-opt bndDir( 'OSSILE/OSSILE' );
-
 //
 // Test the behavior of the assertCharEquals() and assertCharNotEquals() sub-procedures.
 //
 
-/copy ../../main/QRPGLESRC/IBMiUnit_h.rpgle
-/copy /QIBM/UserData/OSSILE-master/main/message/message_h.rpgle
+/copy '../../main/QRPGLESRC/IBMiUnit_h.rpgle'
+/copy '../../main/QRPGLESRC/message_h.rpgle'
 
 
 // initialize the test fixtures

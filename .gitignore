@@ -1,1 +1,8 @@
-build-output/
+/*.bnddir
+/*.entry
+/*.cmd
+/*.lib
+/*.rpglepgm
+/*.srvpgm
+/*.rpglemod
+/*.test

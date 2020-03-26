@@ -5,7 +5,6 @@
 // feedback during the testing.
 //
 
-ctl-opt  bndDir( 'OSSILE/OSSILE' );
 ctl-opt  dftActGrp( *no );
 
 // plug-in definition is done by the main-line code
@@ -36,7 +35,7 @@ dcl-s totalTestCases   int( 10 );
 dcl-s suiteName        varchar( 10 );
 
 /copy IBMiUi_h
-/copy /QIBM/UserData/OSSILE-master/main/message/message_h.rpgle
+/copy 'MESSAGE_H.rpgle'
 
 setup         = %pAddr( IBMiUnitui_setup );
 done          = %pAddr( IBMiUnitui_done );

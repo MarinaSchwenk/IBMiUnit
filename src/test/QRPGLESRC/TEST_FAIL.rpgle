@@ -1,6 +1,6 @@
 **free
 
-ctl-opt bndDir( 'OSSILE/OSSILE' : 'QC2LE' );
+ctl-opt bndDir( 'QC2LE' );
 
 //
 // Test the behavior of the fail() sub-procedures.
@@ -12,8 +12,8 @@ ctl-opt bndDir( 'OSSILE/OSSILE' : 'QC2LE' );
 // and should not be done by any other test over this library.
 //
 
-/copy ../../main/QRPGLESRC/IBMiUnit_h.rpgle
-/copy /QIBM/UserData/OSSILE-master/main/message/message_h.rpgle
+/copy '../../main/QRPGLESRC/IBMiUnit_h.rpgle'
+/copy '../../main/QRPGLESRC/MESSAGE_H.rpgle'
 
 
 // initialize the test fixtures

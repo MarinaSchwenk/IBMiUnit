@@ -1,12 +1,10 @@
 **free
 
-ctl-opt bndDir( 'OSSILE/OSSILE' );
-
 //
 // Test the behavior of the assert() sub-procedures.
 //
 
-/copy ../../main/QRPGLESRC/IBMiUnit_h.rpgle
+/copy '../../main/QRPGLESRC/IBMiUnit_h.rpgle'
 
 
 // initialize the test fixtures

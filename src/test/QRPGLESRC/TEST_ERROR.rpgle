@@ -1,16 +1,16 @@
 **free
 
-ctl-opt bndDir( 'OSSILE/OSSILE' : 'QC2LE' );
+ctl-opt bndDir( 'QC2LE' );
 
 //
 // Make sure IBMiUnit catches sub-procedure errors.
 //
 
-/copy ../../main/QRPGLESRC/IBMiUnit_h.rpgle
-/copy /QIBM/UserData/OSSILE-master/main/message/message_h.rpgle
+/copy '../../main/QRPGLESRC/IBMiUnit_h.rpgle'
+/copy '../../main/QRPGLESRC/MESSAGE_H.rpgle'
 
 /define IBMiUi_noMain
-/copy IBMiUnit/QRPGLESRC,IBMiUi_h
+/copy '../../main/QRPGLESRC/IBMiUi_h.rpgle'
 
 
 // initialize the test fixtures

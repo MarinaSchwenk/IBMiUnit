@@ -1,6 +1,6 @@
 **free
 
-ctl-opt bndDir( 'OSSILE/OSSILE' : 'QC2LE' );
+ctl-opt bndDir( 'QC2LE' );
 
 //
 // Test the behavior of the setup and teardown sub-procedures.
@@ -10,8 +10,8 @@ ctl-opt bndDir( 'OSSILE/OSSILE' : 'QC2LE' );
 // model for other tests.
 //
 
-/copy ../../main/QRPGLESRC/IBMiUnit_h.rpgle
-/copy /QIBM/UserData/Stevers/OSSILE-master/main/message/message_h.rpgle
+/copy '../../main/QRPGLESRC/IBMiUnit_h.rpgle'
+/copy '../../main/QRPGLESRC/MESSAGE_H.rpgle'
 
 dcl-s callHistory  varchar( 2000 );
 

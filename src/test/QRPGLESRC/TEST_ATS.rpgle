@@ -1,13 +1,13 @@
 **free
 
-ctl-opt bndDir( 'OSSILE/OSSILE' ) datFmt( *iso ) timFmt( *iso );
+ctl-opt datFmt( *iso ) timFmt( *iso );
 
 //
 // Test the behavior of the assertTimestampEquals() and assertTimestampNotEquals() sub-procedures.
 //
 
-/copy ../../main/QRPGLESRC/IBMiUnit_h.rpgle
-/copy /QIBM/UserData/OSSILE-master/main/message/message_h.rpgle
+/copy '../../main/QRPGLESRC/IBMiUnit_h.rpgle'
+/copy '../../main/QRPGLESRC/MESSAGE_H.rpgle'
 
 
 // initialize the test fixtures

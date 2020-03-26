@@ -1,15 +1,13 @@
 **free
 
-ctl-opt bndDir( 'OSSILE/OSSILE' );
-
 //
 // Make sure the numberOfXxx calculations are correct
 //
 
-/copy ../../main/QRPGLESRC/IBMiUnit_h.rpgle
+/copy '../../main/QRPGLESRC/IBMiUnit_h.rpgle'
 
 /define IBMiUi_noMain
-/copy ../../main/QRPGLESRC/IBMiUi_h.rpgle
+/copy '../../main/QRPGLESRC/IBMiUi_h.rpgle'
 
 
 // initialize the test fixtures
