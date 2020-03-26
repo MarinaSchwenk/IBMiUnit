@@ -8,6 +8,18 @@ TARGET=V7R2M0
 TESTFILES:=$(notdir $(shell ls src/test/QRPGLESRC/*.rpgle))
 TESTS:= $(patsubst %.rpgle,%.test,$(TESTFILES))
 
+help:
+	@echo ""
+	@echo "Build help for IBMiUnit."
+	@echo ""
+	@echo "\tgmake all                 - Build all objects into IBMIUNIT"
+	@echo "\tgmake tests               - Build all tests into IBMIUNIT"
+	@echo "\tgmake clean               - Clear IBMIUNIT library and clean temp files"
+	@echo ""
+	@echo "\tgmake all TGTLIB=MYLIB    - Build IBMiUNIT into MYLIB library"
+	@echo "\tgmake all TARGET=V7R2M0   - Specifify target object version."
+	@echo ""
+
 all: $(TGTLIB).lib IBMIUNIT.srvpgm IBMIUNIT.bnddir RUNTEST.rpglepgm IBMIUIDSP.rpglepgm IBMIUIINT.rpglepgm
 	@echo "Application built!"
 

@@ -1,30 +1,15 @@
 # IBMiUnit
 An RPGLE unit testing framework 
 
-## Dependencies 
-
-[OSSILE](https://github.com/OSSILE/OSSILE)
-
-Download and restore the OSSILE library to your system. That `README.md` has instructions on how to do this.
-
 ## Installation
 
 ### Clone Git Repository
 
 This is the easiest way to obtain IBMiUnit; everyone has a Git client, right?
 
-Well, this may not *currently* be the easiest way because the source still has a dependency on the [OSSILE](https://github.com/OSSILE/OSSILE) product. This will be removed in a future version of IBMiUnit but for now we assume and require the OSSILE library.
-
-1. Navigate to the directory where you want to place the new `IBMiUnit` folder on the i Series
-1. `git clone https://github.com/MarinaSchwenk/IBMiUnit.git`
-1. Open QShell in the `IBMiUnit` folder
-1. Run the `build` script; there are 6 optional parameters:
-  - `-l <obj-lib>` (that's a letter "L") install IBMiUnit to the specified library; default is `IBMIUNIT`
-  - `-s <src-lib>` copy source to the given library; default is to leave the source on the IFS and compile from there
-  - `-o <obj-owner>` the user profile that will own the new objects; default is `QPGMR`
-  - `-f` copy the obj-lib back into the repository as a save file; this is only useful to the repository contributors
-  - `-t` compile the test suite over IBMiUnit
-  - `-v` verbose output; this may be helpful or necessary when errors are encountered
+1. Clone this repository: `git clone git@github.com:MarinaSchwenk/IBMiUnit.git`
+2. Change directory into it: `cd IBMiUnit`
+3. Use `gmake` (on yum as `make-gnu.ppc64`) to build IBMiUnit.
 
 You can keep up-to-date with IBMiUnit by pulling from the repository and re-building.
 
