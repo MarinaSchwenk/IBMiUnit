@@ -940,6 +940,7 @@ dcl-proc runTests;
 
             callUiCase( ui.testSetup : testCase );
             status = callProcedure( testSuite.testSetupProcedure );
+            testCase.result = status;                             
 
             if ( status = RESULT_SUCCESSFUL );
 
