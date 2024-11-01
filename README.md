@@ -1,12 +1,6 @@
 # IBMiUnit
 An RPGLE unit testing framework 
 
-## Dependencies 
-
-[OSSILE](https://github.com/OSSILE/OSSILE)
-
-Download and restore the OSSILE library to your system. That `README.md` has instructions on how to do this.
-
 ## Installation
 
 ### Clone Git Repository

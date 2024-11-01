@@ -1,9 +1,6 @@
 **free
 
-//
-// IBMiUnit testing framework
-//
-// IBMiUnit Copyright (c) 2019 Marina Schwenk, Steve Johnson-Evers
+// Copyright (c) 2024 Marina Schwenk, Steve Johnson-Evers
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,19 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>
 //
-//-------------------------------------------------------------------------------------------------
+// Public definitions for the IBMiUnit testing framework.
+//
 
-ctl-opt  bndDir( 'OSSILE/OSSILE' );
 ctl-opt  datFmt( *iso )  timFmt( *iso );
+ctl-opt  bnddir( 'MESSAGE' : 'ARRAYLIST' );
+ctl-opt  copyright( 'IBMiUnit Copyright (c) 2024 Marina Schwenk, Steve Johnson-Evers' );
 ctl-opt  noMain;
 
-/copy IBMiUnit_h
+
+/copy IBMIUNIT/QRPGLESRC,IBMiUnit_h
 
 /define IBMiUi_noMain
-/copy IBMiUi_h
+/copy IBMIUNIT/QRPGLESRC,IBMiUi_h
 
-/copy ArrayLst_h
-/copy /QIBM/UserData/OSSILE-master/main/message/message_h.rpgle
+/copy IBMIUNIT/QRPGLESRC,ArrayLst_h
+/copy IBMIUNIT/QRPGLESRC,message_h
 
 dcl-ds ui_t qualified template;
    setup            pointer( *proc );
