@@ -1,4 +1,5 @@
-             strPgmExp  pgmLvl( *current ) signature( 'IBMiUnit V1.1' )
+             
+      strPgmExp  pgmLvl( *current ) signature( 'IBMiUnit V1.2' )
 
                 export     symbol( IBMiUnit_setupSuite )
                 export     symbol( IBMiUnit_teardownSuite )
@@ -24,10 +25,41 @@
                 export     symbol( assertTimestampEquals )
                 export     symbol( assertTimestampNotEquals )
 
-				/* exported, but not for public use */
+                                /* exported, but not for public use */
                 export     symbol( IBMiUnit_registerUi )
 
-             endPgmExp 
+             endPgmExp
+
+	strPgmExp  pgmLvl( *current ) signature( 'IBMiUnit V1.1' )
+
+                export     symbol( IBMiUnit_setupSuite )
+                export     symbol( IBMiUnit_teardownSuite )
+                export     symbol( IBMiUnit_addTestSuite )
+                export     symbol( IBMiUnit_addTestCase )
+
+                export     symbol( fail )
+                export     symbol( assertOff )
+                export     symbol( assertOn )
+                export     symbol( assertNull )
+                export     symbol( assertNotNull )
+
+                export     symbol( assertCharEquals )
+                export     symbol( assertCharNotEquals )
+                export     symbol( assertDateEquals )
+                export     symbol( assertDateNotEquals )
+                export     symbol( assertFloatEquals )
+                export     symbol( assertFloatNotEquals )
+                export     symbol( assertNumericEquals )
+                export     symbol( assertNumericNotEquals )
+                export     symbol( assertTimeEquals )
+                export     symbol( assertTimeNotEquals )
+                export     symbol( assertTimestampEquals )
+                export     symbol( assertTimestampNotEquals )
+
+                                /* exported, but not for public use */
+                export     symbol( IBMiUnit_registerUi )
+
+             endPgmExp
 
              strPgmExp  pgmLvl( *prv ) signature( 'BMiUnit V1.00' )
 
@@ -55,7 +87,7 @@
                 export     symbol( assertTimestampEquals )
                 export     symbol( assertTimestampNotEquals )
 
-				/* exported, but not for public use */
+                                /* exported, but not for public use */
                 export     symbol( IBMiUnit_registerUi )
 
-             endPgmExp 			 
+             endPgmExp

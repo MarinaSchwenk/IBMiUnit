@@ -1,12 +1,29 @@
 **free
 
+// Copyright (c) 2024 Marina Schwenk, Steve Johnson-Evers
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, version 3.
+//
+// This program is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>
+//
+// Public definitions for the IBMiUnit testing framework.
+//
 //
 // IBMiUnit UI plug-in that uses the status line for
 // feedback during the testing.
 //
 
-ctl-opt  bndDir( 'OSSILE/OSSILE' );
+ctl-opt  copyright( 'IBMiUnit Copyright (c) 2024 Marina Schwenk, Steve Johnson-Evers' );
 ctl-opt  dftActGrp( *no );
+ctl-opt  bnddir('MESSAGE');
 
 // plug-in definition is done by the main-line code
 
@@ -35,8 +52,8 @@ dcl-s currentTestCase  int( 10 );
 dcl-s totalTestCases   int( 10 );
 dcl-s suiteName        varchar( 10 );
 
-/copy IBMiUi_h
-/copy /QIBM/UserData/OSSILE-master/main/message/message_h.rpgle
+/copy IBMIUNIT/QRPGLESRC,IBMiUi_h
+/copy IBMIUNIT/QRPGLESRC,message_h
 
 setup         = %pAddr( IBMiUnitui_setup );
 done          = %pAddr( IBMiUnitui_done );
