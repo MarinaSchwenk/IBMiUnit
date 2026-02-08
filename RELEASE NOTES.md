@@ -26,3 +26,11 @@ Released November 15, 2019
 Released October 31st 2024
 
 1. Removed the dependency on OSSILE. 
+
+### Version 1.3
+
+Released February 7th 2026 
+
+1. Brought the save file back to v7r3 
+
+
