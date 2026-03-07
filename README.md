@@ -81,16 +81,52 @@ You can keep up-to-date with IBMiUnit by pulling from the repository and re-buil
 
 A successful test example:
 
-    > ibmiunit/rununit qtehdr_t
+    > ibmiunit/runtest qtehdr_t
       All 2 tests ran successfully
 
 A test with a failure:
 
-    > ibmiunit/rununit qtehdr_t                                             
+    > ibmiunit/runtest qtehdr_t                                             
       assertion failure in calculateSurcharges_changeOrder: Number of tariff
         items expected:<1> but was:<2>                                      
       Done: 0 errors, 1 failures, 1 successful test(s)
 
 ## FAQ
+1. What version of IBMi OS does IBMiUnit Support? 
+    As of 2025 we still go back to V7r3. However moving forwards, any enhancements will be for V7R4 and above. 
+2. When will there be a GUI version? 
+    The plan has always been to integrate IBMiUnit into RDi or as of the last couple of years, VsCode. However this process takes time and we do not have a ETA on the extension for vsCode yet. 
+3. How hard is it to pivot to unit testing? 
+   Unit testing is part of the test driven development paradymn. However you do not have to implement every piece of that paradymn and can pick up unit testing pretty quickly. 
+4. Can you unit test subfiles? 
+    No, as of right now we dont have support for validating subfiles and including them into the framework. 
+5. Can I unit test existing RPG programs. 
+    Technically yes, however that does not fit the true unit testing paradymn. The process of unit testing is to take small pieces and test them individually. Service program procedures fits beautifully for this task, however you can just take straight logic and unit test those pieces. For example 
 
-(TODO for IBMiUnit) 
+    ctl-opt bndDir( 'IBMIUNIT/IBMIUNIT' );
+
+    /copy IBMiUnit/QRPGLESRC,IBMiUnit_H
+
+    // test initialization/registration
+
+    IBMiUnit_setupSuite( 'TextUtil Tests' );
+
+    IBMiUnit_addTestCase( %pAddr( myLogic) : 'myLogic' );
+
+    IBMiUnit_teardownSuite();
+    return;
+
+    // test cases
+
+    dcl-proc myLogic;
+
+        dcl-s myString  varchar( 50 ) inz( 'Testing plain logic' ); 
+        
+       assertCharEquals( 'Testing'
+                       : %subst( myString, 1 7  )
+                       );
+
+    end-proc;
+
+6. Do I need a special compile command for the unit test programs? 
+   No, IBMiUnit uses the standard compile commands and don't need anything special. 
